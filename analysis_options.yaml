@@ -1,0 +1,13 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    # Treat deprecated member use as a warning, not an error
+    deprecated_member_use: warning
+    deprecated_member_use_from_same_package: warning
+
+linter:
+  rules:
+    - avoid_print
+    - prefer_const_constructors
+    - prefer_const_declarations

@@ -1,0 +1,21 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+// Redirect all build output to the project-root /build folder,
+// which is where the Flutter tool expects the APK.
+rootProject.layout.buildDirectory =
+    rootProject.layout.projectDirectory.dir("../build/root")
+
+subprojects {
+    layout.buildDirectory =
+        rootProject.layout.projectDirectory.dir("../build/${project.name}")
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.layout.projectDirectory.dir("../build")
+}
