@@ -6,12 +6,12 @@ import '../services/game_state_service.dart';
 import '../widgets/lesson_illustration.dart';
 
 /// Full-screen card for reading a single lesson and marking it complete.
-class LessonDetailScreen extends StatefulWidget {
+class TermDetailScreen extends StatefulWidget {
   final Lesson lesson;
   final int lessonIndex;
   final int totalLessons;
 
-  const LessonDetailScreen({
+  const TermDetailScreen({
     super.key,
     required this.lesson,
     required this.lessonIndex,
@@ -19,10 +19,10 @@ class LessonDetailScreen extends StatefulWidget {
   });
 
   @override
-  State<LessonDetailScreen> createState() => _LessonDetailScreenState();
+  State<TermDetailScreen> createState() => _TermDetailScreenState();
 }
 
-class _LessonDetailScreenState extends State<LessonDetailScreen> {
+class _TermDetailScreenState extends State<TermDetailScreen> {
   bool _showCompletion = false;
 
   @override

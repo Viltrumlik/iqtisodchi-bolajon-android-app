@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart';
 import '../models/lesson.dart';
+import '../models/lesson_plan.dart';
 import '../models/quiz_question.dart';
 import '../models/shop_item.dart';
+import '../models/student_profile.dart';
+import '../data/lesson_plans_data.dart';
 import '../data/lessons_data.dart';
 import '../data/quiz_data.dart';
 import '../data/shop_data.dart';
@@ -18,6 +21,9 @@ class GameStateService extends ChangeNotifier {
   Set<String> _purchasedIds = {};
   Set<String> _completedLessonIds = {};
   Set<String> _answeredQuestionIds = {};
+  List<LessonPlan> _lessonPlans = [];
+  Set<String> _readPlanIds = {};
+  StudentProfile _profile = StudentProfile.empty;
 
   // ── Getters ──────────────────────────────────────────────────────────────────
   int get money => _money;
@@ -27,6 +33,16 @@ class GameStateService extends ChangeNotifier {
   Set<String> get purchasedIds => Set.unmodifiable(_purchasedIds);
   Set<String> get completedLessonIds => Set.unmodifiable(_completedLessonIds);
   Set<String> get answeredQuestionIds => Set.unmodifiable(_answeredQuestionIds);
+  List<LessonPlan> get lessonPlans => List.unmodifiable(_lessonPlans);
+  Set<String> get readPlanIds => Set.unmodifiable(_readPlanIds);
+  StudentProfile get profile => _profile;
+
+  /// False until the child has entered their name on the welcome screen.
+  bool get hasProfile => _profile.isComplete;
+
+  /// Lesson plans for one grade, in document order.
+  List<LessonPlan> plansForGrade(int grade) =>
+      _lessonPlans.where((p) => p.grade == grade).toList();
 
   // ── Shop unlock logic ────────────────────────────────────────────────────────
   int get ehtiyojPurchased => _shopItems
@@ -49,6 +65,14 @@ class GameStateService extends ChangeNotifier {
   Future<void> init() async {
     await _storage.init();
     _loadFromStorage();
+    // Lesson plans live in a bundled JSON asset built from the Word documents.
+    try {
+      _lessonPlans = await loadLessonPlans();
+    } catch (e) {
+      debugPrint('Dars ishlanmalarini yuklab bo\'lmadi: $e');
+      _lessonPlans = [];
+    }
+    notifyListeners();
   }
 
   void _loadFromStorage() {
@@ -56,6 +80,12 @@ class GameStateService extends ChangeNotifier {
     _purchasedIds = _storage.getPurchasedItems().toSet();
     _completedLessonIds = _storage.getCompletedLessons().toSet();
     _answeredQuestionIds = _storage.getAnsweredQuestions().toSet();
+    _readPlanIds = _storage.getReadPlans().toSet();
+    _profile = StudentProfile(
+      firstName: _storage.getFirstName(),
+      lastName: _storage.getLastName(),
+      gender: GenderX.fromId(_storage.getGender()),
+    );
 
     _lessons = buildLessons().map((l) {
       return l.copyWith(isCompleted: _completedLessonIds.contains(l.id));
@@ -93,6 +123,30 @@ class GameStateService extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── Lesson plans (dars ishlanmalari) ─────────────────────────────────────────
+  Future<void> markPlanRead(String planId) async {
+    if (_readPlanIds.contains(planId)) return;
+    _readPlanIds.add(planId);
+    await _storage.saveReadPlans(_readPlanIds.toList());
+    notifyListeners();
+  }
+
+  // ── Student profile ──────────────────────────────────────────────────────────
+  Future<void> saveProfile({
+    required String firstName,
+    required String lastName,
+    required Gender gender,
+  }) async {
+    _profile = StudentProfile(
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      gender: gender,
+    );
+    await _storage.saveProfile(
+        _profile.firstName, _profile.lastName, gender.id);
+    notifyListeners();
+  }
+
   // ── Quiz ─────────────────────────────────────────────────────────────────────
   Future<void> markQuestionAnswered(String questionId) async {
     _answeredQuestionIds.add(questionId);
@@ -126,6 +180,7 @@ class GameStateService extends ChangeNotifier {
     _purchasedIds = {};
     _completedLessonIds = {};
     _answeredQuestionIds = {};
+    _readPlanIds = {};
     _lessons = buildLessons();
     _questions = buildQuizQuestions();
     _shopItems = buildShopItems();

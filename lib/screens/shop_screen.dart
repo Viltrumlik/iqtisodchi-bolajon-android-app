@@ -3,7 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../models/shop_item.dart';
 import '../services/game_state_service.dart';
-import '../utils/format.dart';
 import '../widgets/circle_back_button.dart';
 import '../widgets/money_display.dart';
 import '../widgets/shop_item_card.dart';

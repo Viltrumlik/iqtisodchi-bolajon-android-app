@@ -7,6 +7,10 @@ class StorageService {
   static const _keyPurchased      = 'eg_purchased';
   static const _keyCompleted      = 'eg_completed';
   static const _keyQuizAnswered   = 'eg_quiz_answered';
+  static const _keyFirstName      = 'eg_first_name';
+  static const _keyLastName       = 'eg_last_name';
+  static const _keyGender         = 'eg_gender';
+  static const _keyReadPlans      = 'eg_read_plans';
 
   late final SharedPreferences _prefs;
 
@@ -44,6 +48,25 @@ class StorageService {
   Future<void> saveAnsweredQuestions(List<String> ids) =>
       _prefs.setStringList(_keyQuizAnswered, ids);
 
+  // ── Read lesson plan IDs ──────────────────────────────────────────────────
+
+  List<String> getReadPlans() => _prefs.getStringList(_keyReadPlans) ?? [];
+
+  Future<void> saveReadPlans(List<String> ids) =>
+      _prefs.setStringList(_keyReadPlans, ids);
+
+  // ── Student profile ───────────────────────────────────────────────────────
+
+  String getFirstName() => _prefs.getString(_keyFirstName) ?? '';
+  String getLastName()  => _prefs.getString(_keyLastName) ?? '';
+  String? getGender()   => _prefs.getString(_keyGender);
+
+  Future<void> saveProfile(String firstName, String lastName, String gender) async {
+    await _prefs.setString(_keyFirstName, firstName);
+    await _prefs.setString(_keyLastName, lastName);
+    await _prefs.setString(_keyGender, gender);
+  }
+
   // ── Full reset (for testing / restart) ────────────────────────────────────
 
   Future<void> resetAll() async {
@@ -51,5 +74,7 @@ class StorageService {
     await _prefs.remove(_keyPurchased);
     await _prefs.remove(_keyCompleted);
     await _prefs.remove(_keyQuizAnswered);
+    await _prefs.remove(_keyReadPlans);
+    // The child's name and avatar deliberately survive a progress reset.
   }
 }

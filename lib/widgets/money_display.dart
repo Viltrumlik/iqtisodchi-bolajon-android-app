@@ -44,18 +44,28 @@ class MoneyDisplay extends StatelessWidget {
             ),
           ],
         ),
+        // The balance grows as the child plays, so the amount scales down
+        // rather than overflowing the pill.
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text('💰', style: TextStyle(fontSize: fontSize * 0.85)),
             const SizedBox(width: 6),
-            Text(
-              formatMoney(money),
-              style: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-                shadows: const [Shadow(color: Colors.deepOrange, blurRadius: 4)],
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  formatMoney(money),
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    shadows: const [
+                      Shadow(color: Colors.deepOrange, blurRadius: 4)
+                    ],
+                  ),
+                ),
               ),
             ),
           ],

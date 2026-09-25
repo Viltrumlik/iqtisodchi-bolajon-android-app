@@ -5,11 +5,13 @@ import '../services/game_state_service.dart';
 import '../widgets/circle_back_button.dart';
 import '../widgets/lesson_card.dart';
 import '../widgets/money_display.dart';
-import 'lesson_detail_screen.dart';
+import 'term_detail_screen.dart';
 
-/// Scrollable list of all financial literacy lesson cards.
-class LessonsScreen extends StatelessWidget {
-  const LessonsScreen({super.key});
+/// "Iqtisodiy atamalar" — scrollable list of the financial-literacy term
+/// cards. The class-based lesson plans (dars ishlanmalari) live in
+/// [GradesScreen] instead.
+class TermsScreen extends StatelessWidget {
+  const TermsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class LessonsScreen extends StatelessWidget {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+            colors: [Color(0xFF9B59D0), Color(0xFF6A1B9A)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -43,15 +45,17 @@ class LessonsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            '📚 Darslar',
+                            '📖 Iqtisodiy atamalar',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 24,
+                              fontSize: 21,
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
                             ),
                           ),
                           Text(
-                            '$completed/$total bajarildi',
+                            '$completed/$total ta atama o\'rganildi',
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.82),
                               fontSize: 13,
@@ -108,7 +112,7 @@ class LessonsScreen extends StatelessWidget {
                           index: index,
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => LessonDetailScreen(
+                              builder: (_) => TermDetailScreen(
                                 lesson: lesson,
                                 lessonIndex: index,
                                 totalLessons: total,

@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
+import '../models/student_profile.dart';
 import '../services/game_state_service.dart';
 import '../widgets/animated_button.dart';
 import '../widgets/money_display.dart';
-import 'lessons_screen.dart';
+import 'grades_screen.dart';
+import 'onboarding_screen.dart';
+import 'terms_screen.dart';
 import 'quiz_groups_screen.dart';
 import 'shop_screen.dart';
 import 'mini_game_screen.dart';
+import 'word_game_groups_screen.dart';
+import 'coin_count_screen.dart';
+import 'puzzle_screen.dart';
 
 /// Main entry screen — shows earned money and navigation to all four sections.
 class HomeScreen extends StatelessWidget {
@@ -31,35 +37,16 @@ class HomeScreen extends StatelessWidget {
             children: [
               // ── Header ────────────────────────────────────────────────────
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 12, 8),
+                padding: const EdgeInsets.fromLTRB(18, 12, 8, 6),
                 child: Row(
                   children: [
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '🌟 Iqtisodchi Bolajon',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              letterSpacing: -0.3,
-                            ),
-                          ).animate()
-                              .fadeIn(duration: 450.ms)
-                              .slideX(begin: -0.2, end: 0),
-                          Text(
-                            'Moliyani o\'rgan, kelajakni qur!',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white.withValues(alpha: 0.72),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ).animate(delay: 180.ms).fadeIn(duration: 380.ms),
-                        ],
-                      ),
+                      child: const _StudentBadge()
+                          .animate()
+                          .fadeIn(duration: 450.ms)
+                          .slideX(begin: -0.2, end: 0),
                     ),
+                    const SizedBox(width: 4),
                     IconButton(
                       onPressed: () => _showResetDialog(context),
                       icon: const Icon(Icons.refresh_rounded,
@@ -100,15 +87,24 @@ class HomeScreen extends StatelessWidget {
                     crossAxisCount: 2,
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
-                    childAspectRatio: size.width > 400 ? 1.1 : 0.98,
-                    physics: const NeverScrollableScrollPhysics(),
+                    childAspectRatio: size.width > 400 ? 1.15 : 1.05,
+                    physics: const BouncingScrollPhysics(),
                     children: [
                       AnimatedButton(
                         label: 'Darslar',
                         emoji: '📚',
                         colors: const [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
-                        onTap: () => _push(context, const LessonsScreen()),
+                        onTap: () => _push(context, const GradesScreen()),
                       ).animate(delay: 580.ms)
+                          .fadeIn(duration: 350.ms)
+                          .slideY(begin: 0.25, end: 0),
+
+                      AnimatedButton(
+                        label: 'Atamalar',
+                        emoji: '📖',
+                        colors: const [Color(0xFF9B59D0), Color(0xFF6A1B9A)],
+                        onTap: () => _push(context, const TermsScreen()),
+                      ).animate(delay: 620.ms)
                           .fadeIn(duration: 350.ms)
                           .slideY(begin: 0.25, end: 0),
 
@@ -136,6 +132,34 @@ class HomeScreen extends StatelessWidget {
                         colors: const [Color(0xFFDA22FF), Color(0xFF9733EE)],
                         onTap: () => _push(context, const MiniGameScreen()),
                       ).animate(delay: 820.ms)
+                          .fadeIn(duration: 350.ms)
+                          .slideY(begin: 0.25, end: 0),
+
+                      AnimatedButton(
+                        label: 'Harflar',
+                        emoji: '🔤',
+                        colors: const [Color(0xFF11998E), Color(0xFF38EF7D)],
+                        onTap: () =>
+                            _push(context, const WordGameGroupsScreen()),
+                      ).animate(delay: 900.ms)
+                          .fadeIn(duration: 350.ms)
+                          .slideY(begin: 0.25, end: 0),
+
+                      AnimatedButton(
+                        label: 'Sanash',
+                        emoji: '🪙',
+                        colors: const [Color(0xFF2193B0), Color(0xFF6DD5ED)],
+                        onTap: () => _push(context, const CoinCountScreen()),
+                      ).animate(delay: 980.ms)
+                          .fadeIn(duration: 350.ms)
+                          .slideY(begin: 0.25, end: 0),
+
+                      AnimatedButton(
+                        label: 'Puzzle',
+                        emoji: '🧩',
+                        colors: const [Color(0xFFF093FB), Color(0xFFF5576C)],
+                        onTap: () => _push(context, const PuzzleScreen()),
+                      ).animate(delay: 1060.ms)
                           .fadeIn(duration: 350.ms)
                           .slideY(begin: 0.25, end: 0),
                     ],
@@ -217,6 +241,88 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
+// ── Student badge ──────────────────────────────────────────────────────────────
+
+/// Avatar + name in the header. Tapping it reopens the welcome screen so the
+/// child can change their name or avatar.
+class _StudentBadge extends StatelessWidget {
+  const _StudentBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = context.watch<GameStateService>().profile;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const OnboardingScreen(isEditing: true),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          child: Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.16),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.35),
+                    width: 2,
+                  ),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Image.asset(
+                  profile.gender.asset,
+                  filterQuality: FilterQuality.medium,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      profile.isComplete
+                          ? 'Salom, ${profile.firstName}! 👋'
+                          : '🌟 Iqtisodchi Bolajon',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    Text(
+                      profile.lastName.isNotEmpty
+                          ? profile.lastName
+                          : 'Moliyani o\'rgan, kelajakni qur!',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: Colors.white.withValues(alpha: 0.72),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 // ── Progress chips ─────────────────────────────────────────────────────────────
 
 class _ProgressRow extends StatelessWidget {
@@ -231,21 +337,21 @@ class _ProgressRow extends StatelessWidget {
       children: [
         _Chip(
           emoji: '📚',
-          value: '${gs.completedLessonIds.length}/${gs.lessons.length}',
+          value: '${gs.readPlanIds.length}/${gs.lessonPlans.length}',
           label: 'Dars',
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
+        _Chip(
+          emoji: '📖',
+          value: '${gs.completedLessonIds.length}/${gs.lessons.length}',
+          label: 'Atama',
+        ),
+        const SizedBox(width: 8),
         _Chip(
           emoji: '🧠',
           value:
               '${gs.answeredQuestionIds.length}/${gs.questions.length}',
           label: 'Test',
-        ),
-        const SizedBox(width: 10),
-        _Chip(
-          emoji: '🛒',
-          value: '${gs.purchasedIds.length}',
-          label: 'Xarid',
         ),
       ],
     );
